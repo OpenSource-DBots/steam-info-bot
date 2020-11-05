@@ -1,0 +1,62 @@
+from datetime import datetime
+from discord.ext import commands
+import json
+
+
+"""
+Summary:
+    Get the current time and format it to H:M:S
+"""
+def get_current_time():
+    current_time = datetime.now()
+    return current_time.strftime('%H:%M:%S')
+
+
+"""
+Get the value of a given key in a file (most likely json)
+"""
+def get_json_value(file_path: str, key: str):
+    with open(file_path, 'r') as cfg:
+        raw_json = json.loads(cfg.read())
+        return raw_json[key]
+
+
+class Client(commands.Bot):
+
+    client = commands.Bot(command_prefix='.')
+
+    def __init__(self):
+        super().__init__(command_prefix='.')
+        self.load_extensions()
+
+    async def on_connect(self):
+        print(f'[i] [{get_current_time()}] {self.user} is connecting')
+
+    async def on_ready(self):
+        print(f'[i] [{get_current_time()}] {self.user} has connected!')
+
+    """
+    Run the bot
+    """
+    def run(self):
+        try:
+            self.loop.run_until_complete(self.start(get_json_value('./confidential-keys.json', 'discord_bot')))
+        except:
+            print(f'[!] [{get_current_time()}] Failed to run the bot. Perhaps the bot token is invalid!')
+
+    """
+    Load the Cog extensions
+    """
+    def load_extensions(self):
+        extensions = []
+
+        for extension in extensions:
+            try:
+                self.load_extension(extension)
+            except:
+                print(f'[!] [{get_current_time()}] Failed to load extension [{extension}].')
+
+
+if __name__ == '__main__':
+    client = Client()
+    client.run()
