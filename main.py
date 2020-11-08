@@ -6,6 +6,8 @@ import json
 """
 Summary:
     Get the current time and format it to H:M:S
+Returns:
+    The time formatted in H:M:S
 """
 def get_current_time():
     current_time = datetime.now()
@@ -13,7 +15,10 @@ def get_current_time():
 
 
 """
-Get the value of a given key in a file (most likely json)
+Summary:
+    Get the value of a given key in a file (most likely json)
+Returns:
+    The json value that matches the key
 """
 def get_json_value(file_path: str, key: str):
     with open(file_path, 'r') as cfg:
@@ -23,10 +28,10 @@ def get_json_value(file_path: str, key: str):
 
 class Client(commands.Bot):
 
-    client = commands.Bot(command_prefix='.')
+    client = commands.Bot(command_prefix='s.')
 
     def __init__(self):
-        super().__init__(command_prefix='.')
+        super().__init__(command_prefix='s.')
         self.load_extensions()
 
     async def on_connect(self):
@@ -36,7 +41,8 @@ class Client(commands.Bot):
         print(f'[i] [{get_current_time()}] {self.user} has connected!')
 
     """
-    Run the bot
+    Summary:
+        Run the bot
     """
     def run(self):
         try:
@@ -45,14 +51,16 @@ class Client(commands.Bot):
             print(f'[!] [{get_current_time()}] Failed to run the bot. Perhaps the bot token is invalid!')
 
     """
-    Load the Cog extensions
+    Summary:
+        Load the Cog extensions
     """
     def load_extensions(self):
-        extensions = []
+        extensions = ['cogs.latency', 'cogs.steam_user']
 
         for extension in extensions:
             try:
                 self.load_extension(extension)
+                print(f'[i] [{get_current_time()}] Successfully loaded extension [{extension}]')
             except:
                 print(f'[!] [{get_current_time()}] Failed to load extension [{extension}].')
 
