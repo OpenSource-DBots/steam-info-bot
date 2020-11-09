@@ -49,6 +49,7 @@ def get_user_state(raw_state):
 
 class SteamUser(commands.Cog):
 
+    # The url to the Steam Web API which has the steam profile data
     public_data_url = f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/' \
                       f'?key={get_json_value(file_path="./confidential-keys.json", key="steam_web_api")}&steamids='
 
@@ -58,10 +59,15 @@ class SteamUser(commands.Cog):
     @commands.command(name='state', aliases=['profile_state', 'user_state', 'visibility', 'profile_visibility',
                                              'user_visibility'])
     async def state(self, ctx, steam_id):
-        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        if not self.is_valid_steam_id(steam_id):
+            return
 
+        # Result of the http request in json
+        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        # Get the 'personastate' of the user
         state = get_user_state(result["response"]["players"][0]["personastate"])
 
+        # Create a Discord embed
         embed = discord.Embed(description=f'The state of SteamID `{steam_id}` is:\n'
                                           f'{state[0]} {state[1]}',
                               color=discord.Color.from_rgb(114, 137, 218))
@@ -69,15 +75,30 @@ class SteamUser(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='avatar', aliases=['get_avatar', 'profile_picture'])
-    async def avatar(self, ctx, steam_id):
+    async def avatar(self, ctx, steam_id, size='full'):
+        if not self.is_valid_steam_id(steam_id):
+            return
+
+        # Result of the http request in json
         result = send_http_request(f'{self.public_data_url}{steam_id}')
 
+        # Create a Discord embed
         embed = discord.Embed(description=f'The avatar of SteamID `{steam_id}` is:',
                               color=discord.Color.from_rgb(114, 137, 218))
         embed.set_image(url=result['response']['players'][0]['avatarfull'])
 
         await ctx.send(embed=embed)
 
+    """
+    Summary:
+        Check if the SteamID is valid
+    Returns:
+        True is the SteamID is valid, else False
+    """
+
+    def is_valid_steam_id(self, steam_id):
+        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        return len(result['response']['players']) > 0
 
 def setup(client):
     client.add_cog(SteamUser(client))
