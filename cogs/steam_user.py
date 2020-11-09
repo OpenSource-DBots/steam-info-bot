@@ -60,6 +60,7 @@ class SteamUser(commands.Cog):
                                              'user_visibility'])
     async def state(self, ctx, steam_id):
         if not self.is_valid_steam_id(steam_id):
+            await self.not_valid_steam_id(ctx, steam_id)
             return
 
         # Result of the http request in json
@@ -77,6 +78,7 @@ class SteamUser(commands.Cog):
     @commands.command(name='avatar', aliases=['get_avatar', 'profile_picture'])
     async def avatar(self, ctx, steam_id, size='full'):
         if not self.is_valid_steam_id(steam_id):
+            await self.not_valid_steam_id(ctx, steam_id)
             return
 
         # Result of the http request in json
@@ -91,11 +93,20 @@ class SteamUser(commands.Cog):
 
     """
     Summary:
+        This function gets executed when the Steam ID is not valid
+    """
+    async def not_valid_steam_id(self, ctx, steam_id):
+        embed = discord.Embed(description=f':no_entry: {ctx.author.mention}, `{steam_id}` is an invalid SteamID.',
+                              color=discord.Color.from_rgb(114, 137, 218))
+
+        await ctx.send(embed=embed)
+
+    """
+    Summary:
         Check if the SteamID is valid
     Returns:
         True is the SteamID is valid, else False
     """
-
     def is_valid_steam_id(self, steam_id):
         result = send_http_request(f'{self.public_data_url}{steam_id}')
         return len(result['response']['players']) > 0
