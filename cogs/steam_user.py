@@ -27,26 +27,6 @@ def get_json_value(file_path: str, key: str):
         return raw_json[key]
 
 
-"""
-Summary:
-    Switch state for the 'profilestate' in the Steam json
-Returns:
-    The key/value pair that belongs to the 'profilestate'
-"""
-def get_user_state(raw_state):
-    switch = {
-        0: [':red_circle:', 'Offline'],
-        1: [':green_circle:', 'Online'],
-        2: [':blue_circle:', 'Busy'],
-        3: [':orange_circle:', 'Away'],
-        4: [':zzz:', 'Snooze'],
-        5: [':repeat:', 'Looking to trade'],
-        6: [':video_game:', 'Looking to play']
-    }
-
-    return switch.get(raw_state, ':question: Unknown state')
-
-
 class SteamUser(commands.Cog):
 
     # The url to the Steam Web API which has the steam profile data
@@ -66,7 +46,7 @@ class SteamUser(commands.Cog):
         # Result of the http request in json
         result = send_http_request(f'{self.public_data_url}{steam_id}')
         # Get the 'personastate' of the user
-        state = get_user_state(result["response"]["players"][0]["personastate"])
+        state = self.get_user_state(result["response"]["players"][0]["personastate"])
 
         # Create a Discord embed
         embed = discord.Embed(description=f'The state of SteamID `{steam_id}` is:\n'
@@ -93,10 +73,29 @@ class SteamUser(commands.Cog):
 
     """
     Summary:
+        Switch state for the 'profilestate' in the Steam json
+    Returns:
+        The key/value pair that belongs to the 'profilestate'
+    """
+    def get_user_state(self, raw_state):
+        switch = {
+            0: [':red_circle:', 'Offline'],
+            1: [':green_circle:', 'Online'],
+            2: [':blue_circle:', 'Busy'],
+            3: [':orange_circle:', 'Away'],
+            4: [':zzz:', 'Snooze'],
+            5: [':repeat:', 'Looking to trade'],
+            6: [':video_game:', 'Looking to play']
+        }
+
+        return switch.get(raw_state, ':question: Unknown state')
+
+    """
+    Summary:
         This function gets executed when the Steam ID is not valid
     """
     async def not_valid_steam_id(self, ctx, steam_id):
-        embed = discord.Embed(description=f':no_entry: {ctx.author.mention}, `{steam_id}` is an invalid SteamID.',
+        embed = discord.Embed(description=f'{ctx.author.mention}, the Steam ID `{steam_id}` is an invalid.',
                               color=discord.Color.from_rgb(114, 137, 218))
 
         await ctx.send(embed=embed)
