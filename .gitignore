@@ -110,7 +110,7 @@ env.bak/
 venv.bak/
 
 # Virtual Environments
-*[bot-env]
+bot-env
 
 # Spyder project settings
 .spyderproject
