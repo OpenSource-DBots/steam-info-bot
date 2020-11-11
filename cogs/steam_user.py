@@ -64,12 +64,35 @@ class SteamUser(commands.Cog):
         # Result of the http request in json
         result = send_http_request(f'{self.public_data_url}{steam_id}')
 
-        # Create a Discord embed
-        embed = discord.Embed(description=f'The avatar of SteamID `{steam_id}` is:',
-                              color=discord.Color.from_rgb(114, 137, 218))
-        embed.set_image(url=result['response']['players'][0]['avatarfull'])
+        # The avatar sizes that the Steam Web API provides
+        valid_avatar_size = [
+            'small',
+            'medium',
+            'full'
+        ]
+
+        # Check if the size is valid
+        if size in valid_avatar_size:
+            embed = discord.Embed(description=f'The avatar of SteamID `{steam_id}` is:',
+                                  color=discord.Color.from_rgb(114, 137, 218))
+            embed.set_footer(text=f'Avatar size: {size.capitalize()} | {self.get_avatar_size(size)}')
+
+            # In the Steam Web API the small avatar has no prefix on the end, so change the 'small' to an empty string
+            if size == 'small':
+                size = ''
+
+            embed.set_image(url=result['response']['players'][0][f'avatar{size}'])
+        else:
+            # Create a Discord embed
+            embed = discord.Embed(description=f'{ctx.author.mention}, please select a valid size '
+                                              f'<`small` | `medium` | `full`>',
+                                  color=discord.Color.from_rgb(114, 137, 218))
 
         await ctx.send(embed=embed)
+
+    @commands.command(name='info', aliases=['information'])
+    async def info(self, ctx, steam_id):
+        pass
 
     """
     Summary:
@@ -77,7 +100,7 @@ class SteamUser(commands.Cog):
     Returns:
         The key/value pair that belongs to the 'profilestate'
     """
-    def get_user_state(self, raw_state):
+    def get_user_state(self, state):
         switch = {
             0: [':red_circle:', 'Offline'],
             1: [':green_circle:', 'Online'],
@@ -88,7 +111,22 @@ class SteamUser(commands.Cog):
             6: [':video_game:', 'Looking to play']
         }
 
-        return switch.get(raw_state, ':question: Unknown state')
+        return switch.get(state, 'Unknown state')
+
+    """
+    Summary:
+        Switch state for the 'avatar[...]' in the Steam json
+    Returns:
+        The key/value pair that belongs to the 'avatar[...]'
+    """
+    def get_avatar_size(self, size):
+        switch = {
+            'small': '32x32',
+            'medium': '64x64',
+            'full': '184x184'
+        }
+
+        return switch.get(size, 'Unknown size')
 
     """
     Summary:
