@@ -34,7 +34,7 @@ Summary:
 Returns:
     Utc from timestamp
 """
-def timestamp_to_utc(self, timestamp):
+def timestamp_to_utc(timestamp):
     time = datetime.utcfromtimestamp(timestamp).strftime('%m/%d/%Y')
     return time
 
@@ -208,8 +208,8 @@ class SteamUser(commands.Cog):
         True is the SteamID is valid, else False
     """
     def is_valid_steam_id(self, steam_id):
-        result = send_http_request(f'{self.web_request_url}{steam_id}')
-        return len(result['response']['players']) > 0
+        result = requests.get(f'{self.web_request_url}{steam_id}')
+        return result.status_code == 200
 
 
 def setup(client):
