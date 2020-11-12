@@ -91,7 +91,7 @@ class SteamUser(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='info', aliases=['information'])
+    @commands.command(name='info', aliases=['information', 'data', 'user-data', 'steam-data'])
     async def info(self, ctx, steam_id):
         if not self.is_valid_steam_id(steam_id):
             await self.not_valid_steam_id(ctx, steam_id)
