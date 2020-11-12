@@ -1,3 +1,4 @@
+from datetime import datetime
 import discord
 from discord.ext import commands
 import json
@@ -137,7 +138,9 @@ class SteamUser(commands.Cog):
                                           f':mag: **Real Name:** {real_name}\n'
                                           f'{state[0]} **State:** {state[1]}\n'
                                           f'{flag} **Country:** {country}\n'
-                                          f':joystick: **In-game:** {game}',
+                                          f':joystick: **In-game:** {game}\n'
+                                          f':calendar: **Account Creation:** '
+                                          f'{self.timestamp_to_utc(first_result["timecreated"])}',
                               color=discord.Color.from_rgb(114, 137, 218))
         embed.set_thumbnail(url=result["response"]["players"][0]["avatar"])
 
@@ -196,6 +199,16 @@ class SteamUser(commands.Cog):
     def is_valid_steam_id(self, steam_id):
         result = send_http_request(f'{self.public_data_url}{steam_id}')
         return len(result['response']['players']) > 0
+
+    """
+    Summary:
+        Get the utc from timestamp
+    Returns:
+        Utc from timestamp
+    """
+    def timestamp_to_utc(self, timestamp):
+        time = datetime.utcfromtimestamp(timestamp).strftime('%m/%d/%Y')
+        return time
 
 
 def setup(client):
