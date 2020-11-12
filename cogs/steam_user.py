@@ -185,7 +185,7 @@ class SteamUser(commands.Cog):
         This function gets executed when the Steam ID is not valid
     """
     async def not_valid_steam_id(self, ctx, steam_id):
-        embed = discord.Embed(description=f'{ctx.author.mention}, the Steam ID `{steam_id}` is an invalid.',
+        embed = discord.Embed(description=f'{ctx.author.mention}, the Steam ID `{steam_id}` is invalid.',
                               color=discord.Color.from_rgb(114, 137, 218))
 
         await ctx.send(embed=embed)
