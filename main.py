@@ -55,7 +55,7 @@ class Client(commands.Bot):
         Load the Cog extensions
     """
     def load_extensions(self):
-        extensions = ['cogs.latency', 'cogs.steam_user']
+        extensions = ['cogs.latency', 'cogs.steam_user', 'cogs.steam_friends']
 
         for extension in extensions:
             try:
