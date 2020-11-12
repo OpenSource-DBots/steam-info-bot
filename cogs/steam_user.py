@@ -105,15 +105,12 @@ class SteamUser(commands.Cog):
         state = self.get_user_state(first_result["personastate"])
 
         # Real name of the Steam user. 'Not set' if there is no real name set
-        real_name = ''
         try:
             real_name = first_result["realname"]
         except:
             real_name = 'Not set'
 
         # Flag and country of the Steam user. ':pirate_flag' and 'Not set' if there is no country set
-        flag = ''
-        country = ''
         try:
             # The flag of the Steam user's country
             flag = f':flag_{first_result["loccountrycode"]}:'.lower()
@@ -124,9 +121,6 @@ class SteamUser(commands.Cog):
             country = 'Not set'
 
         # Current playing game of the Steam user. 'Not set' if the user is not playing a game
-        game = ''
-        game_store_page = ''
-        game = ''
         try:
             game = first_result["gameextrainfo"]
             game_store_page = f'https://store.steampowered.com/app/{first_result["gameid"]}'
