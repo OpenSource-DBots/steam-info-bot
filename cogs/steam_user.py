@@ -123,13 +123,27 @@ class SteamUser(commands.Cog):
             flag = ':pirate_flag:'
             country = 'Not set'
 
+        # Current playing game of the Steam user. 'Not set' if the user is not playing a game
+        game = ''
+        game_store_page = ''
+        game = ''
+        try:
+            game = first_result["gameextrainfo"]
+            game_store_page = f'https://store.steampowered.com/app/{first_result["gameid"]}'
+            game = f'[{game}]({game_store_page})'
+        except:
+            game = 'Not playing'
+            game_store_page = 'https://store.steampowered.com/'
+            game = 'Nothing playing'
+
         # Create a Discord embed
         embed = discord.Embed(description=f'`{steam_id}`\'s personal information\n'
-                                          f':bust_in_silhouette: Name: {first_result["personaname"]}\n'
-                                          f':link: Profile URL: [/id/{steam_id}/]({first_result["profileurl"]})\n'
-                                          f':mag: Real Name: {real_name}\n'
-                                          f'{state[0]} State: {state[1]}\n'
-                                          f'{flag} Country: {country}',
+                                          f':bust_in_silhouette: **Name:** {first_result["personaname"]}\n'
+                                          f':link: **Profile URL:** [/id/{steam_id}/]({first_result["profileurl"]})\n'
+                                          f':mag: **Real Name:** {real_name}\n'
+                                          f'{state[0]} **State:** {state[1]}\n'
+                                          f'{flag} **Country:** {country}\n'
+                                          f':joystick: **In-game:** {game}',
                               color=discord.Color.from_rgb(114, 137, 218))
         embed.set_thumbnail(url=result["response"]["players"][0]["avatar"])
 
