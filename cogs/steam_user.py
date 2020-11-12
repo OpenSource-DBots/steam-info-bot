@@ -92,7 +92,40 @@ class SteamUser(commands.Cog):
 
     @commands.command(name='info', aliases=['information'])
     async def info(self, ctx, steam_id):
-        pass
+        if not self.is_valid_steam_id(steam_id):
+            await self.not_valid_steam_id(ctx, steam_id)
+            return
+
+        # Result of the http request in json
+        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        # Get the first result from the Steam Json
+        first_result = result["response"]["players"][0]
+
+        # Get the 'personastate' of the user
+        state = self.get_user_state(first_result["personastate"])
+
+        # Real name of the Steam user. 'Not set' if there is no real name set
+        real_name = ''
+        try:
+            real_name = first_result["realname"]
+        except:
+            real_name = 'Not set'
+
+        # The flag of the Steam user's country
+        flag = f':flag_{first_result["loccountrycode"]}:'.lower()
+        country = get_json_value(file_path="./countries-info/countries.json",
+                                 key=first_result["loccountrycode"].upper())
+
+        # Create a Discord embed
+        embed = discord.Embed(description=f'`{steam_id}`\'s personal information\n'
+                                          f':bust_in_silhouette: Name: {first_result["personaname"]}\n'
+                                          f':mag: Real Name: {real_name}\n'
+                                          f'{state[0]} State: {state[1]}\n'
+                                          f'{flag} Country: {country}',
+                              color=discord.Color.from_rgb(114, 137, 218))
+        embed.set_thumbnail(url=result["response"]["players"][0]["avatar"])
+
+        await ctx.send(embed=embed)
 
     """
     Summary:
@@ -147,6 +180,7 @@ class SteamUser(commands.Cog):
     def is_valid_steam_id(self, steam_id):
         result = send_http_request(f'{self.public_data_url}{steam_id}')
         return len(result['response']['players']) > 0
+
 
 def setup(client):
     client.add_cog(SteamUser(client))
