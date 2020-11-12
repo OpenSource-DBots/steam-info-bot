@@ -26,7 +26,7 @@ def get_json_value(file_path: str, key: str):
     with open(file_path, 'r') as cfg:
         raw_json = json.loads(cfg.read())
         return raw_json[key]
-    
+
 
 """
 Summary:
@@ -58,7 +58,7 @@ class SteamUser(commands.Cog):
         # Result of the http request in json
         result = send_http_request(f'{self.web_request_url}{steam_id}')
         # Get the 'personastate' of the user
-        state = self.get_user_state(result["response"]["players"][0]["personastate"])
+        state = self.get_user_state(result['response']['players'][0]['personastate'])
 
         # Create a Discord embed
         embed = discord.Embed(description=f'The state of SteamID `{steam_id}` is:\n'
@@ -111,7 +111,7 @@ class SteamUser(commands.Cog):
         # Result of the http request in json
         result = send_http_request(f'{self.web_request_url}{steam_id}')
         # Get the first result from the Steam Json
-        first_result = result["response"]["players"][0]
+        first_result = result['response']['players'][0]
 
         # Get the 'personastate' of the user
         state = self.get_user_state(first_result["personastate"])
@@ -151,7 +151,7 @@ class SteamUser(commands.Cog):
                                           f'{flag} **Country:** {country}\n'
                                           f':joystick: **In-game:** {game}\n'
                                           f':calendar: **Account Creation:** '
-                                          f'{self.timestamp_to_utc(first_result["timecreated"])}',
+                                          f'{timestamp_to_utc(first_result["timecreated"])}',
                               color=discord.Color.from_rgb(114, 137, 218))
         embed.set_thumbnail(url=result["response"]["players"][0]["avatar"])
 
