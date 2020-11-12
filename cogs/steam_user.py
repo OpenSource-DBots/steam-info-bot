@@ -26,12 +26,23 @@ def get_json_value(file_path: str, key: str):
     with open(file_path, 'r') as cfg:
         raw_json = json.loads(cfg.read())
         return raw_json[key]
+    
+
+"""
+Summary:
+    Get the utc from timestamp
+Returns:
+    Utc from timestamp
+"""
+def timestamp_to_utc(self, timestamp):
+    time = datetime.utcfromtimestamp(timestamp).strftime('%m/%d/%Y')
+    return time
 
 
 class SteamUser(commands.Cog):
 
     # The url to the Steam Web API which has the steam profile data
-    public_data_url = f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/' \
+    web_request_url = f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/' \
                       f'?key={get_json_value(file_path="./confidential-keys.json", key="steam_web_api")}&steamids='
 
     def __init__(self, client):
@@ -45,7 +56,7 @@ class SteamUser(commands.Cog):
             return
 
         # Result of the http request in json
-        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        result = send_http_request(f'{self.web_request_url}{steam_id}')
         # Get the 'personastate' of the user
         state = self.get_user_state(result["response"]["players"][0]["personastate"])
 
@@ -63,7 +74,7 @@ class SteamUser(commands.Cog):
             return
 
         # Result of the http request in json
-        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        result = send_http_request(f'{self.web_request_url}{steam_id}')
 
         # The avatar sizes that the Steam Web API provides
         valid_avatar_size = [
@@ -98,7 +109,7 @@ class SteamUser(commands.Cog):
             return
 
         # Result of the http request in json
-        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        result = send_http_request(f'{self.web_request_url}{steam_id}')
         # Get the first result from the Steam Json
         first_result = result["response"]["players"][0]
 
@@ -128,7 +139,7 @@ class SteamUser(commands.Cog):
             game = f'[{game}]({game_store_page})'
         except:
             game = 'Not playing'
-            game_store_page = 'https://store.steampowered.com/'
+            game_store_page = ''
             game = 'Nothing playing'
 
         # Create a Discord embed
@@ -197,18 +208,8 @@ class SteamUser(commands.Cog):
         True is the SteamID is valid, else False
     """
     def is_valid_steam_id(self, steam_id):
-        result = send_http_request(f'{self.public_data_url}{steam_id}')
+        result = send_http_request(f'{self.web_request_url}{steam_id}')
         return len(result['response']['players']) > 0
-
-    """
-    Summary:
-        Get the utc from timestamp
-    Returns:
-        Utc from timestamp
-    """
-    def timestamp_to_utc(self, timestamp):
-        time = datetime.utcfromtimestamp(timestamp).strftime('%m/%d/%Y')
-        return time
 
 
 def setup(client):
