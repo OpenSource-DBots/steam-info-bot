@@ -111,14 +111,22 @@ class SteamUser(commands.Cog):
         except:
             real_name = 'Not set'
 
-        # The flag of the Steam user's country
-        flag = f':flag_{first_result["loccountrycode"]}:'.lower()
-        country = get_json_value(file_path="./countries-info/countries.json",
-                                 key=first_result["loccountrycode"].upper())
+        # Flag and country of the Steam user. ':pirate_flag' and 'Not set' if there is no country set
+        flag = ''
+        country = ''
+        try:
+            # The flag of the Steam user's country
+            flag = f':flag_{first_result["loccountrycode"]}:'.lower()
+            country = get_json_value(file_path="./countries-info/countries.json",
+                                     key=first_result["loccountrycode"].upper())
+        except:
+            flag = ':pirate_flag:'
+            country = 'Not set'
 
         # Create a Discord embed
         embed = discord.Embed(description=f'`{steam_id}`\'s personal information\n'
                                           f':bust_in_silhouette: Name: {first_result["personaname"]}\n'
+                                          f':link: Profile URL: [/id/{steam_id}/]({first_result["profileurl"]})\n'
                                           f':mag: Real Name: {real_name}\n'
                                           f'{state[0]} State: {state[1]}\n'
                                           f'{flag} Country: {country}',
