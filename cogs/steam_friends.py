@@ -129,6 +129,12 @@ class SteamFriends(commands.Cog):
 
         return embed
 
+    """
+    Summary:
+        Place the Steam ID somewhere in the request link
+    Returns:
+        Valid link with Steam ID
+    """
     def set_steam_id_in_http_request(self, steam_id):
         # The url to the Steam Web API which has the steam profile data
         user_request_url = f'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/' \
@@ -137,6 +143,12 @@ class SteamFriends(commands.Cog):
 
         return user_request_url
 
+    """
+    Summary:
+        Calculate the total pages needed for showing each friend
+    Returns:
+        Total pages count
+    """
     def calculate_total_pages(self, steam_id):
         result = send_http_request(self.set_steam_id_in_http_request(steam_id))
 
