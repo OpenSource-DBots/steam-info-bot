@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 import discord
 from discord.ext import commands
@@ -84,9 +85,22 @@ class SteamFriends(commands.Cog):
 
         self.steam_id = steam_id
 
-        message = await ctx.send(embed=self.get_new_page(steam_id))
+        loading_message_embed = discord.Embed(
+            description=f'Loading `{self.steam_id}`\'s friends list',
+            color=discord.Color.from_rgb(114, 137, 218))
+        loading_message = await ctx.send(embed=loading_message_embed)
+
+        embed = self.get_new_page(steam_id)
+
+        await loading_message.delete()
+
+        message = await ctx.send(embed=embed)
         await message.add_reaction(emoji=self.previous_page_emoji)
         await message.add_reaction(emoji=self.next_page_emoji)
+
+        # Clear the reactions after 1 minute
+        await asyncio.sleep(60)
+        await message.clear_reactions()
 
     def get_new_page(self, steam_id):
         embed = discord.Embed(description=f'**`{steam_id}`\'s Friends List '
@@ -106,9 +120,12 @@ class SteamFriends(commands.Cog):
                 user_result = send_http_request(f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
                                                 f'?key={get_json_value(file_path="./confidential-keys.json", key="steam_web_api")}'
                                                 f'&steamids={user["steamid"]}')
-                embed.description += f'**{index + 1}:** {self.get_user_state(user_result["response"]["players"][0]["personastate"])[0]} ' \
-                                     f'[{self.get_user_state(user_result["response"]["players"][0]["personastate"])[1]}] ' \
-                                     f'{user_result["response"]["players"][0]["personaname"]}\n'
+                user_result_short = user_result["response"]["players"][0]
+
+                embed.description += f'**{index + 1}:** {self.get_user_state(user_result_short["personastate"])[0]} ' \
+                                     f'[*{self.get_user_state(user_result_short["personastate"])[1]}*] ' \
+                                     f'[[/id/{user_result_short["steamid"]}/]({user_result_short["profileurl"]})] ' \
+                                     f'**{user_result_short["personaname"]}**\n'
 
         return embed
 
